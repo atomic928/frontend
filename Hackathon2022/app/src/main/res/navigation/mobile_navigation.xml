@@ -3,7 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_login">
+    app:startDestination="@+id/navigation_signup">
+
+    <fragment
+        android:id="@+id/navigation_signup"
+        android:name="com.example.hackathon2022.ui.singup.SignupFragment"
+        android:label="Signup"
+        tools:layout="@layout/fragment_signup"/>
 
     <fragment
         android:id="@+id/navigation_login"
