@@ -10,4 +10,8 @@ class HomeViewModel : ViewModel() {
         value = "This is home Fragment"
     }
     val text: LiveData<String> = _text
+
+    fun putText(p0: String) {
+        _text.value = p0
+    }
 }

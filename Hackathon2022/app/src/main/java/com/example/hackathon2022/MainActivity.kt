@@ -8,13 +8,17 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.hackathon2022.databinding.ActivityMainBinding
+import com.example.hackathon2022.ui.home.HomeFragment
+import com.example.hackathon2022.ui.home.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlin.properties.Delegates
 
@@ -22,6 +26,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private var mManager: SensorManager by Delegates.notNull<SensorManager>()
     private var mSensor: Sensor by Delegates.notNull<Sensor>()
+
+//    val homeViewModel =
+//        ViewModelProvider(this).get(HomeViewModel::class.java)
+
+    private val homeViewModel: HomeViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -69,6 +78,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         Log.v("nullpo", event?.values!![1].toString())
         //Z軸方法
         Log.v("nullpo", event?.values!![2].toString())
+
+        homeViewModel.putText(event.values!![0].toString())
+
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
