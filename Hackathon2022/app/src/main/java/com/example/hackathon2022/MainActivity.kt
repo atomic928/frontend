@@ -1,6 +1,7 @@
 package com.example.hackathon2022
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -13,6 +14,8 @@ import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -21,6 +24,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.hackathon2022.databinding.ActivityMainBinding
 import com.example.hackathon2022.ui.home.HomeViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import java.util.jar.Manifest
 import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener {
@@ -47,7 +51,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         //ロケーションマネージャーに端末のロケーションサービスを関連づける
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
 
         val navView: BottomNavigationView = binding.navView
 
@@ -93,25 +96,31 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     override fun onPause() {
         super.onPause()
         mManager.unregisterListener(this)
-        //ポーズ時にはGPS（位置情報）の取得を解除する
+        //ポーズ時にはGPSの取得を解除する
         locationManager.removeUpdates(this)
     }
 
     override fun onResume() {
         super.onResume()
-        
+        //GPSの取得許可があるのかをチェック
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //GPSの使用が許可されていなければパーミッションを要求し、その後再度チェックが行われる
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), 1)
+            return
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0f, this)
         mManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
     override fun onLocationChanged(location: Location) {
         speed = if (location.hasSpeed()) {
-            //速度が出ている時(km/hに変換して変数speedへ)
-            location.speed * 3.6f
+            location.speed*3.6f
         } else {
-            //速度が出ていない時
             0f
         }
         homeViewModel.putSpeed(speed)
+        Log.d("speedTest", speed.toString())
     }
 }
+
 

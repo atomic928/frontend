@@ -39,7 +39,7 @@ class HomeFragment : Fragment(){
             textY.text = it[1].toString()
             textZ.text = it[2].toString()
             if (it[0] < 1) {
-                homeViewModel.putBackgroundColor(Color.WHITE)
+                homeViewModel.putBackgroundColor(Color.BLACK)
             } else if (it[0] < 4) {
                 homeViewModel.putBackgroundColor(Color.BLUE)
             } else {
@@ -53,7 +53,7 @@ class HomeFragment : Fragment(){
             binding.root.setBackgroundColor(it)
         }
 
-        val textSpeed: TextView = binding.textSpeed
+        var textSpeed: TextView = binding.textSpeed
 
         homeViewModel.speed.observe(viewLifecycleOwner) {
             textSpeed.text = it.toString()
