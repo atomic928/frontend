@@ -1,23 +1,16 @@
 package com.example.hackathon2022.ui.home
 
-import android.app.Activity
-import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+
+import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
+import com.example.hackathon2022.AlertDialogFragment
 import com.example.hackathon2022.databinding.FragmentHomeBinding
-import kotlin.properties.Delegates
 
 class HomeFragment : Fragment(){
 
@@ -33,17 +26,39 @@ class HomeFragment : Fragment(){
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        val homeViewModel =
-//            ViewModelProvider(this).get(HomeViewModel::class.java)
 
         _binding = FragmentHomeBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val textView: TextView = binding.textHome
+        val textX: TextView = binding.textX
+        val textY: TextView = binding.textY
+        val textZ: TextView = binding.textZ
 
-        homeViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it.toString()
+        homeViewModel.acceleration.observe(viewLifecycleOwner) {
+            textX.text = it[0].toString()
+            textY.text = it[1].toString()
+            textZ.text = it[2].toString()
+            if (it[0] < 1) {
+                homeViewModel.putBackgroundColor(Color.WHITE)
+            } else if (it[0] < 4) {
+                homeViewModel.putBackgroundColor(Color.BLUE)
+            } else {
+                val dialog = AlertDialogFragment()
+                dialog.show(childFragmentManager, "sample")
+                homeViewModel.putBackgroundColor(Color.RED)
+            }
         }
+
+        homeViewModel.backgroundColor.observe(viewLifecycleOwner) {
+            binding.root.setBackgroundColor(it)
+        }
+
+        val textSpeed: TextView = binding.textSpeed
+
+        homeViewModel.speed.observe(viewLifecycleOwner) {
+            textSpeed.text = it.toString()
+        }
+
         return root
     }
 
