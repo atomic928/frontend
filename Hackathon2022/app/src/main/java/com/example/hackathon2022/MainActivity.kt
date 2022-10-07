@@ -1,7 +1,10 @@
 package com.example.hackathon2022
 
+import android.app.appsearch.GlobalSearchSession
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -12,6 +15,7 @@ import android.location.LocationManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.ProgressBar
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -21,10 +25,20 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.eclipsesource.json.Json
 import com.example.hackathon2022.databinding.ActivityMainBinding
+import com.example.hackathon2022.ui.dashboard.DashboardViewModel
 import com.example.hackathon2022.ui.home.HomeViewModel
+import com.google.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import java.util.jar.Manifest
+import com.google.gson.GsonBuilder
+import com.google.maps.GeoApiContext
+import com.google.maps.GeocodingApi
+import kotlinx.coroutines.*
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.net.HttpURLConnection
+import java.net.URL
 import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener {
@@ -35,8 +49,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private var speed = 0f
 
     private val homeViewModel: HomeViewModel by viewModels()
+    private val dashboardViewModel: DashboardViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
+
+    //mapのURL(変更可能にする必要あり)
+    private val URL = "https://maps.googleapis.com/maps/api/staticmap?center=35.692134,139.759854&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
+    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +70,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         //ロケーションマネージャーに端末のロケーションサービスを関連づける
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+
+        //非同期処理
+        coroutineScope.launch {
+            val originalDeferred = coroutineScope.async(Dispatchers.IO) {
+                getOriginalBitmap()
+            }
+
+            val originalBitmap = originalDeferred.await()
+            dashboardViewModel.putMap(originalBitmap)
+        }
 
         val navView: BottomNavigationView = binding.navView
 
@@ -121,6 +151,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         homeViewModel.putSpeed(speed)
         Log.d("speedTest", speed.toString())
     }
+
+    private fun getOriginalBitmap(): Bitmap =
+        URL(URL).openStream().use {
+            BitmapFactory.decodeStream(it)
+        }
 }
 
 
