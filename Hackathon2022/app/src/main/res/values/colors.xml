@@ -9,4 +9,7 @@
     <color name="white">#FFFFFFFF</color>
 <!--文字の色-->
     <color name="text_color">#333333</color>
+<!--テーマの色-->
+    <color name="green01">#5BACA4</color>
+    <color name="green02">#41928A</color>
 </resources>
