@@ -58,9 +58,7 @@ class HomeFragment : Fragment(){
         val textY: TextView = binding.textY
         val textZ: TextView = binding.textZ
 
-/*sensorが動いたら自動でいい感じに格納*/
-        /*it==value*/
-        /*グラフ表示*/
+        /*sensorで動作*/
         var mChart: LineChart = binding.chart
         val valueX: ArrayList<Entry> = ArrayList()
         val valueY: ArrayList<Entry> = ArrayList()
@@ -111,7 +109,6 @@ class HomeFragment : Fragment(){
                     gravity[0], gravity[1], gravity[2]
                 )
             }
-            /*不要2?*/
 
             /*リアル加速度表示*/
             valueX.add(Entry(addCount.toFloat(),linearAcceleration[0]))
@@ -146,10 +143,7 @@ class HomeFragment : Fragment(){
             /*このスコープ内のitがスピードを表している*/
             textSpeed.text = it.toString()
         }
-        /**/
-
-
-
+        
         return root
     }
 
@@ -157,7 +151,5 @@ class HomeFragment : Fragment(){
         super.onDestroyView()
         _binding = null
     }
-
-
 
 }
