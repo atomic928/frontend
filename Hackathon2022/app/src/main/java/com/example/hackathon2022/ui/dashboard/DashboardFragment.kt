@@ -15,11 +15,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hackathon2022.R
 import com.example.hackathon2022.RecyclerAdapter
 import com.example.hackathon2022.databinding.FragmentDashboardBinding
+import com.example.hackathon2022.ui.map.MapViewModel
 
 class DashboardFragment : Fragment(){
 
     private var _binding: FragmentDashboardBinding? = null
     private val dashboardViewModel: DashboardViewModel by activityViewModels()
+    private val mapViewModel: MapViewModel by activityViewModels()
 
     // This property is only valid between onCreateView and
     // onDestroyView.

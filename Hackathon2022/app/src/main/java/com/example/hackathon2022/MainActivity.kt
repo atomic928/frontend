@@ -29,6 +29,7 @@ import com.eclipsesource.json.Json
 import com.example.hackathon2022.databinding.ActivityMainBinding
 import com.example.hackathon2022.ui.dashboard.DashboardViewModel
 import com.example.hackathon2022.ui.home.HomeViewModel
+import com.example.hackathon2022.ui.map.MapViewModel
 import com.google.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.gson.GsonBuilder
@@ -50,6 +51,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
     private val homeViewModel: HomeViewModel by viewModels()
     private val dashboardViewModel: DashboardViewModel by viewModels()
+    private val mapViewModel: MapViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -80,6 +82,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
             val originalBitmap = originalDeferred.await()
             dashboardViewModel.putMap(originalBitmap)
+            mapViewModel.putMap(originalBitmap)
         }
 
         val navView: BottomNavigationView = binding.navView
