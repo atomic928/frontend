@@ -13,4 +13,13 @@ class DashboardViewModel : ViewModel() {
     fun putMap(p0: Bitmap) {
         _map.value = p0
     }
+
+    private val _dateList = MutableLiveData<List<String>>()
+    val dateList: LiveData<List<String>> = _dateList
+
+    var dataListSize = 0
+
+    fun putDateList(p0: List<String>) {
+        _dateList.value = p0
+    }
 }

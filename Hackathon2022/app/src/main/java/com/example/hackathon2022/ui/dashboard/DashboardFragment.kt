@@ -37,33 +37,24 @@ class DashboardFragment : Fragment(){
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val TextList = listOf(
-            "○月○日　oo:oo",
-            "○月○日　oo:oo",
-            "○月○日　oo:oo",
-            "○月○日　oo:oo",
-            "○月○日　oo:oo",
-            "○月○日　oo:oo",
-            "○月○日　oo:oo",
-            "○月○日　oo:oo"
-        )
-
         val recyclerView = binding.RecyclerList
-        val adapter = RecyclerAdapter(TextList)
+        dashboardViewModel.dateList.observe(viewLifecycleOwner) {
+            val adapter = RecyclerAdapter(it)
+            adapter.setOnCellClickListener(
+                object : RecyclerAdapter.OnCellClickListener {
+                    override fun onItemClick(item: String) {
+                        //itemデータを渡す処理
+                        setFragmentResult("stringData", bundleOf("itemString" to item))
 
-        adapter.setOnCellClickListener(
-            object : RecyclerAdapter.OnCellClickListener {
-                override fun onItemClick(item: String) {
-                    //itemデータを渡す処理
-                    setFragmentResult("stringData", bundleOf("itemString" to item))
-
-                    //画面遷移処理
-                    findNavController().navigate(R.id.navigation_map)
+                        //画面遷移処理
+                        findNavController().navigate(R.id.navigation_map)
+                    }
                 }
-            }
-        )
+            )
 
-        recyclerView.adapter = adapter
+            recyclerView.adapter = adapter
+        }
+
         recyclerView.layoutManager = LinearLayoutManager(context)
         val dividerItemDecoration = DividerItemDecoration(context, LinearLayoutManager(context).orientation)
         recyclerView.addItemDecoration(dividerItemDecoration)

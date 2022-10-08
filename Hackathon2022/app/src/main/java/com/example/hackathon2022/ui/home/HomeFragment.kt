@@ -21,6 +21,8 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.pow
+import kotlin.math.sqrt
 
 class HomeFragment : Fragment(){
 
@@ -78,10 +80,11 @@ class HomeFragment : Fragment(){
             textX.text = it[0].toString()
             textY.text = it[1].toString()
             textZ.text = it[2].toString()
-            if (it[0] < 1) {
+            val magnitudeOfAcceleration = sqrt(it[0].pow(2)+it[1].pow(2)+it[2].pow(2))
+            if (magnitudeOfAcceleration < 4) {
                 homeViewModel.putBackgroundColor(Color.WHITE)
-            } else if (it[0] < 4) {
-                homeViewModel.putBackgroundColor(Color.BLUE)
+            } else if (magnitudeOfAcceleration < 7.9) {
+                homeViewModel.putBackgroundColor(Color.YELLOW)
             } else {
                 val dialog = AlertDialogFragment()
                 dialog.show(childFragmentManager, "sample")
