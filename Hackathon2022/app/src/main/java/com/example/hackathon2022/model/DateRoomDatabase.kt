@@ -19,7 +19,7 @@ abstract class DateRoomDatabase: RoomDatabase() {
                 if (INSTANCE == null) {
                     INSTANCE = Room.databaseBuilder(
                         context.applicationContext,
-                        DateRoomDatabase::class.java, "drive.db"
+                        DateRoomDatabase::class.java, "Drive.db"
                     )
                         .allowMainThreadQueries()
                         .build()

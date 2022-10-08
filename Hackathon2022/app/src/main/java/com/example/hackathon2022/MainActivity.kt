@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
         if (magnitudeOfAcceleration >= 7.9) {
-            val dateNow = LocalDate.now().toString() + LocalTime.now().toString()
+            val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
             saveData(dateNow)
             loadDate()
         }
