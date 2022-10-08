@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.example.hackathon2022.R
@@ -25,11 +26,14 @@ class SignupFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val homeViewModel =
+        val signupViewModel =
             ViewModelProvider(this).get(SignupViewModel::class.java)
 
         _binding = FragmentSignupBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        val editUsername: EditText = binding.editUsername
+        val editPassword: EditText = binding.editPass
 
         binding.apply {
             btSignup.setOnClickListener {
@@ -40,6 +44,7 @@ class SignupFragment : Fragment() {
             }
             btSignupSelect.setOnClickListener {
                 findNavController().navigate(R.id.navigation_home)
+//                signupViewModel.registerUser(editUsername.text.toString(), editPassword.text.toString())
             }
         }
 
