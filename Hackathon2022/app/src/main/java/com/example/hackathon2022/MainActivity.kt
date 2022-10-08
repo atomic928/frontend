@@ -12,6 +12,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Bundle
+import android.provider.Settings.Global
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
@@ -22,7 +23,10 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.room.Room
 import com.example.hackathon2022.databinding.ActivityMainBinding
+import com.example.hackathon2022.model.Date
+import com.example.hackathon2022.model.DateRoomDatabase
 import com.example.hackathon2022.ui.dashboard.DashboardViewModel
 import com.example.hackathon2022.ui.home.HomeViewModel
 import com.example.hackathon2022.ui.map.MapViewModel
@@ -61,6 +65,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         //ロケーションマネージャーに端末のロケーションサービスを関連づける
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        loadDate()
 
 
         //非同期処理
@@ -148,6 +154,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         URL(URL).openStream().use {
             BitmapFactory.decodeStream(it)
         }
+
+    private fun saveData() {
+        val dateDB = DateRoomDatabase.getInstance(this)
+        val dateDao = dateDB.dateDao()
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                val date = Date(1, "test")
+                dateDao.insert(date)
+            }
+        }
+    }
+
+    private fun loadDate() {
+        val dateDB = DateRoomDatabase.getInstance(this)
+        val dateDao = dateDB.dateDao()
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                val dateList = dateDao.getAll()
+                Log.v("RoomTest", dateList.toString())
+            }
+        }
+    }
 }
 
 
