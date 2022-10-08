@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -31,17 +32,19 @@ class LoginFragment: Fragment() {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        val editUsername: EditText = binding.editUsername
+        val editPassword: EditText = binding.editPass
+
         binding.apply {
             btLogin.setOnClickListener{
-//                findNavController().navigate(R.id.navigation_home)
                   findNavController().navigate(R.id.navigation_login)
             }
             btSignup.setOnClickListener{
-//                findNavController().navigate(R.id.navigation_home)
                 findNavController().navigate(R.id.navigation_signup)
             }
             btLoginSelect.setOnClickListener{
                 findNavController().navigate(R.id.navigation_home)
+//                loginViewModel.login(editUsername.text.toString(), editPassword.text.toString())
             }
         }
 
