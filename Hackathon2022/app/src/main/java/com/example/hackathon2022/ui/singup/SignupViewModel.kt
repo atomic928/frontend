@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import retrofit2.Response
 
 class SignupViewModel : ViewModel() {
-//    private val apiRepository = ApiRepository.instance
+    private val apiRepository = ApiRepository.instance
 
     private val _postResponse = LiveEvent<Response<ResponseData.ResponseGetUser>>()
     val postResponse: LiveData<Response<ResponseData.ResponseGetUser>> get() = _postResponse
@@ -25,15 +25,15 @@ class SignupViewModel : ViewModel() {
     private val _password = MutableLiveData<String>()
     val password: LiveData<String> get() = _password
 
-//    fun registerUser(name: String, pass: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                val postData = PostData.RegisterData(name, pass)
-//                val response = apiRepository.postRegister(postData)
-//                _postResponse.postValue(response)
-//            } catch (e: java.lang.Exception) {
-//                e.printStackTrace()
-//            }
-//        }
-//    }
+    fun registerUser(name: String, pass: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val postData = PostData.RegisterData(name, pass)
+                val response = apiRepository.postRegister(postData)
+                _postResponse.postValue(response)
+            } catch (e: java.lang.Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 }
