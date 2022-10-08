@@ -169,12 +169,18 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private fun loadDate() {
         val dateDB = DateRoomDatabase.getInstance(this)
         val dateDao = dateDB.dateDao()
+        val stringList = mutableListOf<String>()
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
                 val dateList = dateDao.getAll()
+                for (date in dateList) {
+                    date.date?.let { stringList.add(it) }
+                }
+
                 Log.v("RoomTest", dateList.toString())
             }
         }
+        dashboardViewModel.putDateList(stringList)
     }
 }
 
