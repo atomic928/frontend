@@ -4,6 +4,7 @@ package com.example.hackathon2022.ui.home
 import android.graphics.Color
 import android.os.Bundle
 import android.os.DropBoxManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -64,6 +65,12 @@ class HomeFragment : Fragment(){
         val valueX: ArrayList<Entry> = ArrayList()
         val valueY: ArrayList<Entry> = ArrayList()
         val valueZ: ArrayList<Entry> = ArrayList()
+
+        var valueDataSetX = LineDataSet(valueX, "X")//set
+        var valueDataSetY = LineDataSet(valueY, "Y")//set
+        var valueDataSetZ = LineDataSet(valueZ, "Z")//set
+
+
         /*複数のデータセットを格納するリスト*/
         val dataSets = ArrayList<ILineDataSet>()
         homeViewModel.acceleration.observe(viewLifecycleOwner) {
@@ -113,24 +120,42 @@ class HomeFragment : Fragment(){
 
             /*リアル加速度表示*/
             valueX.add(Entry(addCount.toFloat(),linearAcceleration[0]))
-            val valueDataSetX = LineDataSet(valueX, "X")//set
             valueY.add(Entry(addCount.toFloat(),linearAcceleration[1]))
-            val valueDataSetY = LineDataSet(valueY, "Y")//set
             valueZ.add(Entry(addCount.toFloat(),linearAcceleration[2]))
-            val valueDataSetZ = LineDataSet(valueZ, "Z")//set
-            valueDataSetX.lineWidth=1.0f
-            valueDataSetX.color=colors[0]
-            valueDataSetY.lineWidth=1.0f
-            valueDataSetY.color=colors[1]
-            valueDataSetZ.lineWidth=1.0f
-            valueDataSetZ.color=colors[2]
+            valueDataSetX = LineDataSet(valueX, "X")//set
+            valueDataSetY = LineDataSet(valueY, "Y")//set
+            valueDataSetZ = LineDataSet(valueZ, "Z")//set
+            valueDataSetX.lineWidth = 1.0f
+            valueDataSetX.color = colors[0]
+            valueDataSetY.lineWidth = 1.0f
+            valueDataSetY.color = colors[1]
+            valueDataSetZ.lineWidth = 1.0f
+            valueDataSetZ.color = colors[2]
+
+//            Log.v("valueSize", valueX.size.toString())
 
             dataSets.add(valueDataSetX)
             dataSets.add(valueDataSetY)
             dataSets.add(valueDataSetZ)
 
-            mChart.data = LineData(dataSets)//LineData(set)
-            mChart.setVisibleXRangeMaximum(100f) // 表示の幅を決定する
+            /*リストが50以上で頭から抜き出し、容量軽くする*/
+            if (valueX.size > 50) {
+                valueX.removeAt(0)
+                valueY.removeAt(0)
+                valueZ.removeAt(0)
+            }
+
+            if(dataSets.size>50){
+                dataSets.removeAt(0)
+                dataSets.removeAt(0)
+                dataSets.removeAt(0)
+            }
+
+//          Log.v("valueSize", dataSets.size.toString())
+//            Log.v("valueSize", dataSets[0].toString())
+
+            mChart.data = LineData(dataSets)
+            mChart.setVisibleXRangeMaximum(50f) // 表示の幅を決定する
             mChart.moveViewToX(addCount.toFloat()) // 最新のデータまで表示を移動させる
         }
 
@@ -144,7 +169,7 @@ class HomeFragment : Fragment(){
             /*このスコープ内のitがスピードを表している*/
             textSpeed.text = it.toString()
         }
-        
+
         return root
     }
 
