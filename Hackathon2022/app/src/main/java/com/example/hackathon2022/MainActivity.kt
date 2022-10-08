@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -11,11 +12,13 @@ import android.hardware.SensorManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings.Global
 import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavDestination
@@ -33,6 +36,10 @@ import com.example.hackathon2022.ui.map.MapViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import java.net.URL
+import java.time.LocalDate
+import java.time.LocalTime
+import kotlin.math.pow
+import kotlin.math.sqrt
 import kotlin.properties.Delegates
 
 class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener {
@@ -104,6 +111,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     }
 
     //センサーに何かしらのイベントが発生したときに呼ばれる
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onSensorChanged(event: SensorEvent?) {
         //3つの値が配列で入ってくる
         Log.v("sensorTest", "______")
@@ -115,6 +123,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         Log.v("sensorTest", event.values!![2].toString())
 
         homeViewModel.putAcceleration(event.values!!)
+
+        val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
+        if (magnitudeOfAcceleration >= 7.9) {
+            val dateNow = LocalDate.now().toString() + LocalTime.now().toString()
+            saveData(dateNow)
+            loadDate()
+        }
 
     }
 
@@ -155,12 +170,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
             BitmapFactory.decodeStream(it)
         }
 
-    private fun saveData() {
+    private fun saveData(dateNow: String) {
         val dateDB = DateRoomDatabase.getInstance(this)
         val dateDao = dateDB.dateDao()
         GlobalScope.launch {
             withContext(Dispatchers.IO) {
-                val date = Date(1, "test")
+                val number = dashboardViewModel.dataListSize
+                val date = Date(number, dateNow)
                 dateDao.insert(date)
             }
         }
@@ -181,6 +197,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
             }
         }
         dashboardViewModel.putDateList(stringList)
+        dashboardViewModel.dataListSize = stringList.size
     }
 }
 
