@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.activityViewModels
-import com.example.hackathon2022.R
 import com.example.hackathon2022.databinding.FragmentMapBinding
 
 class MapFragment : Fragment() {
