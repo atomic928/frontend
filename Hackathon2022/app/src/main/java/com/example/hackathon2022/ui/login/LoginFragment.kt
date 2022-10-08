@@ -33,6 +33,14 @@ class LoginFragment: Fragment() {
 
         binding.apply {
             btLogin.setOnClickListener{
+//                findNavController().navigate(R.id.navigation_home)
+                  findNavController().navigate(R.id.navigation_login)
+            }
+            btSignup.setOnClickListener{
+//                findNavController().navigate(R.id.navigation_home)
+                findNavController().navigate(R.id.navigation_signup)
+            }
+            btLoginSelect.setOnClickListener{
                 findNavController().navigate(R.id.navigation_home)
             }
         }
