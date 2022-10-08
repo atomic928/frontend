@@ -7,6 +7,7 @@ import android.os.DropBoxManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -137,7 +138,7 @@ class HomeFragment : Fragment(){
             binding.root.setBackgroundColor(it)
         }
 
-        var textSpeed: TextView = binding.textSpeed
+        val textSpeed: TextView = binding.textSpeed
 
         homeViewModel.speed.observe(viewLifecycleOwner) {
             /*このスコープ内のitがスピードを表している*/
