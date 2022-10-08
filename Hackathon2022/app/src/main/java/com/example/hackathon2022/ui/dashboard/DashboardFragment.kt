@@ -5,8 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.setFragmentResult
+import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.hackathon2022.R
+import com.example.hackathon2022.RecyclerAdapter
 import com.example.hackathon2022.databinding.FragmentDashboardBinding
 
 class DashboardFragment : Fragment(){
@@ -28,11 +35,36 @@ class DashboardFragment : Fragment(){
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
-        val ivMap: ImageView = binding.ivMap
+        val TextList = listOf(
+            "○月○日　oo:oo",
+            "○月○日　oo:oo",
+            "○月○日　oo:oo",
+            "○月○日　oo:oo",
+            "○月○日　oo:oo",
+            "○月○日　oo:oo",
+            "○月○日　oo:oo",
+            "○月○日　oo:oo"
+        )
 
-        dashboardViewModel.map.observe(viewLifecycleOwner) {
-            ivMap.setImageBitmap(it)
-        }
+        val recyclerView = binding.RecyclerList
+        val adapter = RecyclerAdapter(TextList)
+
+        adapter.setOnCellClickListener(
+            object : RecyclerAdapter.OnCellClickListener {
+                override fun onItemClick(item: String) {
+                    //itemデータを渡す処理
+                    setFragmentResult("stringData", bundleOf("itemString" to item))
+
+                    //画面遷移処理
+                    findNavController().navigate(R.id.navigation_map)
+                }
+            }
+        )
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
+        val dividerItemDecoration = DividerItemDecoration(context, LinearLayoutManager(context).orientation)
+        recyclerView.addItemDecoration(dividerItemDecoration)
         return root
     }
 

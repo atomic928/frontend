@@ -94,7 +94,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         )
 
         navController.addOnDestinationChangedListener { _, nd: NavDestination, _ ->
-            if (nd.id == R.id.navigation_login || nd.id == R.id.navigation_signup) {
+            if (nd.id == R.id.navigation_login || nd.id == R.id.navigation_signup || nd.id == R.id.navigation_map) {
                 navView.visibility = View.GONE
             } else{
                 navView.visibility = View.VISIBLE
