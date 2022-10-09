@@ -1,5 +1,6 @@
 package com.example.hackathon2022.ui.singup
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,9 +29,14 @@ class SignupViewModel : ViewModel() {
     fun registerUser(name: String, pass: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val postData = PostData.RegisterData(name, pass)
+                val postData = PostData.RegisterData(username = name, password = pass)
                 val response = apiRepository.postRegister(postData)
                 _postResponse.postValue(response)
+                if (response.isSuccessful) {
+                    Log.d("RegisterSuccess", "${response}¥n${response.body()}")
+                } else {
+                    Log.d("RegisterFailure", "$response")
+                }
             } catch (e: java.lang.Exception) {
                 e.printStackTrace()
             }
