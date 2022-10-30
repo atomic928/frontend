@@ -19,4 +19,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/bt_dark_theme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ダークテーマにする"
+        app:layout_constraintTop_toTopOf="@+id/text_notifications"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Button
+        android:id="@+id/bt_light_theme"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ライトテーマにする"
+        app:layout_constraintTop_toTopOf="@+id/bt_dark_theme"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf= "parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
