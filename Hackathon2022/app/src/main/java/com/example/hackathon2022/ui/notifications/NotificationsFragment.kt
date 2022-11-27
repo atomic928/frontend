@@ -1,7 +1,10 @@
 package com.example.hackathon2022.ui.notifications
 
 import android.app.UiModeManager.MODE_NIGHT_NO
+import android.content.Context
 import android.os.Bundle
+import android.preference.PreferenceManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -41,9 +44,14 @@ class NotificationsFragment : Fragment() {
         val buttonDarkTheme: Button = binding.btDarkTheme
         val buttonLightTheme: Button = binding.btLightTheme
         buttonDarkTheme.setOnClickListener {
+            // Darkmodeかどうかを保存
+            val sharedPref = activity?.getSharedPreferences("Dark", Context.MODE_PRIVATE)
+            sharedPref?.edit()?.putString("isDark", "True")?.apply()
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         }
         buttonLightTheme.setOnClickListener {
+            val sharedPref = activity?.getSharedPreferences("Dark", Context.MODE_PRIVATE)
+            sharedPref?.edit()?.putString("isDark", "False")?.apply()
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
         return root
