@@ -82,14 +82,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
 
         //非同期処理
-        coroutineScope.launch {
-            val originalDeferred = coroutineScope.async(Dispatchers.IO) {
-                getOriginalBitmap()
-            }
-
-            val originalBitmap = originalDeferred.await()
-            sensorViewModel.putMap(originalBitmap)
-        }
+//        coroutineScope.launch {
+//            val originalDeferred = coroutineScope.async(Dispatchers.IO) {
+//                getOriginalBitmap()
+//            }
+//
+//            val originalBitmap = originalDeferred.await()
+//            sensorViewModel.putMap(originalBitmap)
+//        }
 
         val navView: BottomNavigationView = binding.navView
 
@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
         if (magnitudeOfAcceleration >= 7.9) {
             val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
-            val date = Date(0, dateNow)
+            val date = Date(0, dateNow, URL)
             sensorViewModel.insert(date)
         }
 
@@ -169,10 +169,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         Log.d("speedTest", speed.toString())
     }
 
-    private fun getOriginalBitmap(): Bitmap =
-        URL(URL).openStream().use {
-            BitmapFactory.decodeStream(it)
-        }
+//    private fun getOriginalBitmap(): Bitmap =
+//        URL(URL).openStream().use {
+//            BitmapFactory.decodeStream(it)
+//        }
 }
 
 

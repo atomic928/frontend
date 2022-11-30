@@ -19,9 +19,9 @@ interface DateDao {
     @Delete
     fun delete(date: Date)
 
-    @Query("SELECT * FROM date_database")
+    @Query("SELECT * FROM date_database1")
     fun getAll(): Flow<List<Date>>
 
-    @Query("DELETE FROM date_database")
+    @Query("DELETE FROM date_database1")
     suspend fun deleteALL()
 }

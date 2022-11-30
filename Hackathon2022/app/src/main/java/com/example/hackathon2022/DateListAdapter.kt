@@ -35,7 +35,7 @@ class DateListAdapter: ListAdapter<Date, DateListAdapter.DateViewHolder>(DATES_C
         //セルのクリックイベントにリスナをセット
         holder.itemView.setOnClickListener {
             //セルがクリックされた時にインターフェースの処理が実行される
-            listener.onItemClick(current.date as String)
+            listener.onItemClick(current.url)
         }
     }
 
