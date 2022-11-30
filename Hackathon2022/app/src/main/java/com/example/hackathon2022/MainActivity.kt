@@ -20,6 +20,7 @@ import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
@@ -33,6 +34,7 @@ import com.example.hackathon2022.model.DateRoomDatabase
 import com.example.hackathon2022.ui.dashboard.DashboardViewModel
 import com.example.hackathon2022.ui.home.HomeViewModel
 import com.example.hackathon2022.ui.map.MapViewModel
+import com.example.hackathon2022.ui.notifications.NotificationsViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import java.net.URL
@@ -52,6 +54,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private val homeViewModel: HomeViewModel by viewModels()
     private val dashboardViewModel: DashboardViewModel by viewModels()
     private val mapViewModel: MapViewModel by viewModels()
+    private val notificationViewModel: NotificationsViewModel by viewModels()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -63,6 +66,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        //ダークモードかどうかを取得する
+        val sharedPref = getSharedPreferences("Dark", Context.MODE_PRIVATE)
+
+        val isDark = sharedPref.getString("isDark", "False")
+
+        if (isDark == "True") {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
         //センサーマネージャーを取得する
         mManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
