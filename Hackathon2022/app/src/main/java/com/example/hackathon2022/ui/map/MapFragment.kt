@@ -7,12 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.fragment.app.activityViewModels
+import com.example.hackathon2022.SensorViewModel
 import com.example.hackathon2022.databinding.FragmentMapBinding
 
 class MapFragment : Fragment() {
 
     private var _binding: FragmentMapBinding? = null
-    private val mapViewModel: MapViewModel by activityViewModels()
+    private val viewModel: SensorViewModel by activityViewModels()
 
     // This property is only valid between onCreateView and
     // onDestroyView
@@ -28,7 +29,7 @@ class MapFragment : Fragment() {
         val root: View = binding.root
 
         val ivMap: ImageView = binding.ivMap
-        mapViewModel.map.observe(viewLifecycleOwner) {
+        viewModel.map.observe(viewLifecycleOwner) {
             ivMap.setImageBitmap(it)
         }
 

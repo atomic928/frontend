@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -14,14 +13,13 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hackathon2022.R
 import com.example.hackathon2022.RecyclerAdapter
+import com.example.hackathon2022.SensorViewModel
 import com.example.hackathon2022.databinding.FragmentDashboardBinding
-import com.example.hackathon2022.ui.map.MapViewModel
 
 class DashboardFragment : Fragment(){
 
     private var _binding: FragmentDashboardBinding? = null
-    private val dashboardViewModel: DashboardViewModel by activityViewModels()
-    private val mapViewModel: MapViewModel by activityViewModels()
+    private val viewModel: SensorViewModel by activityViewModels()
 
     // This property is only valid between onCreateView and
     // onDestroyView.
@@ -38,7 +36,7 @@ class DashboardFragment : Fragment(){
         val root: View = binding.root
 
         val recyclerView = binding.RecyclerList
-        dashboardViewModel.dateList.observe(viewLifecycleOwner) {
+        viewModel.dateList.observe(viewLifecycleOwner) {
             val adapter = RecyclerAdapter(it)
             adapter.setOnCellClickListener(
                 object : RecyclerAdapter.OnCellClickListener {
