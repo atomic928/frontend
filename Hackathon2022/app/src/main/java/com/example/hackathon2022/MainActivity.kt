@@ -1,5 +1,6 @@
 package com.example.hackathon2022
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -8,6 +9,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -30,11 +32,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hackathon2022.databinding.ActivityMainBinding
 import com.example.hackathon2022.model.Date
 import com.example.hackathon2022.model.DateRoomDatabase
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import java.net.URL
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
@@ -44,6 +49,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private var mManager: SensorManager by Delegates.notNull()
     private var mSensor: Sensor by Delegates.notNull()
     private lateinit var locationManager: LocationManager
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var speed = 0f
 
     private val sensorViewModel: SensorViewModel by viewModels {
@@ -53,13 +59,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private lateinit var binding: ActivityMainBinding
 
     //mapのURL(変更可能にする必要あり)
-    private val URL = "https://maps.googleapis.com/maps/api/staticmap?center=35.692134,139.759854&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         //ダークモードかどうかを取得する
         val sharedPref = getSharedPreferences("Dark", Context.MODE_PRIVATE)
@@ -131,10 +138,36 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
         if (magnitudeOfAcceleration >= 7.9) {
             val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
+            var latitude : Double = 0.0
+            var longitude : Double = 0.0
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return
+            }
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location : Location? ->
+                    latitude = location!!.latitude
+                    longitude = location.longitude
+                }
+
+            val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
             val date = Date(0, dateNow, URL)
+
             sensorViewModel.insert(date)
         }
-
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {

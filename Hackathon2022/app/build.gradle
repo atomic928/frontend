@@ -91,4 +91,7 @@ dependencies {
 
     //dark-mode
     implementation("com.github.Dansoftowner:jSystemThemeDetector:3.6")
+
+    // gms
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
 }
