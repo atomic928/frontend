@@ -1,11 +1,17 @@
 package com.example.hackathon2022
 
+import android.app.Application
 import android.graphics.Bitmap
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import com.example.hackathon2022.model.Date
+import com.example.hackathon2022.model.DateRoomDatabase
+import com.example.hackathon2022.repository.DateRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
-class SensorViewModel: ViewModel() {
+class SensorViewModel(application: Application, private val repository: DateRepository): AndroidViewModel(application){
     private val _acceleration = MutableLiveData<FloatArray>()
     val acceleration: LiveData<FloatArray> = _acceleration
 
@@ -34,12 +40,21 @@ class SensorViewModel: ViewModel() {
         _map.value = p0
     }
 
-    private val _dateList = MutableLiveData<List<String>>()
-    val dateList: LiveData<List<String>> = _dateList
+    val allDate: LiveData<List<Date>> = repository.allDates.asLiveData()
 
-    var dataListSize = 0
+    fun insert(date: Date) = viewModelScope.launch {
+        withContext(Dispatchers.IO) {
+            repository.insert(date)
+        }
+    }
+}
 
-    fun putDateList(p0: List<String>) {
-        _dateList.value = p0
+class SensorViewModelFactory(private val repository: DateRepository): ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(SensorViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return SensorViewModel(application = Application(), repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -20,11 +20,13 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Observer
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hackathon2022.databinding.ActivityMainBinding
 import com.example.hackathon2022.model.Date
 import com.example.hackathon2022.model.DateRoomDatabase
@@ -44,7 +46,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private lateinit var locationManager: LocationManager
     private var speed = 0f
 
-    private val sensorViewModel: SensorViewModel by viewModels()
+    private val sensorViewModel: SensorViewModel by viewModels {
+        SensorViewModelFactory((application as DateApplication).repository)
+    }
 
     private lateinit var binding: ActivityMainBinding
 
@@ -76,9 +80,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         //ロケーションマネージャーに端末のロケーションサービスを関連づける
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        loadDate()
-
 
         //非同期処理
         coroutineScope.launch {
@@ -130,8 +131,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
         if (magnitudeOfAcceleration >= 7.9) {
             val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
-            saveData(dateNow)
-            loadDate()
+            val date = Date(0, dateNow)
+            sensorViewModel.insert(date)
         }
 
     }
@@ -172,36 +173,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         URL(URL).openStream().use {
             BitmapFactory.decodeStream(it)
         }
-
-    private fun saveData(dateNow: String) {
-        val dateDB = DateRoomDatabase.getInstance(this)
-        val dateDao = dateDB.dateDao()
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                val number = sensorViewModel.dataListSize
-                val date = Date(number, dateNow)
-                dateDao.insert(date)
-            }
-        }
-    }
-
-    private fun loadDate() {
-        val dateDB = DateRoomDatabase.getInstance(this)
-        val dateDao = dateDB.dateDao()
-        val stringList = mutableListOf<String>()
-        GlobalScope.launch {
-            withContext(Dispatchers.IO) {
-                val dateList = dateDao.getAll()
-                for (date in dateList) {
-                    date.date?.let { stringList.add(it) }
-                }
-
-                Log.v("RoomTest", dateList.toString())
-            }
-        }
-        sensorViewModel.putDateList(stringList)
-        sensorViewModel.dataListSize = stringList.size
-    }
 }
 
 

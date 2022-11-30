@@ -8,13 +8,13 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResult
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.hackathon2022.R
-import com.example.hackathon2022.RecyclerAdapter
-import com.example.hackathon2022.SensorViewModel
+import com.example.hackathon2022.*
 import com.example.hackathon2022.databinding.FragmentDashboardBinding
+import com.example.hackathon2022.model.Date
 
 class DashboardFragment : Fragment(){
 
@@ -35,27 +35,29 @@ class DashboardFragment : Fragment(){
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
+        // DBの読み込み
         val recyclerView = binding.RecyclerList
-        viewModel.dateList.observe(viewLifecycleOwner) {
-            val adapter = RecyclerAdapter(it)
+        val adapter = DateListAdapter()
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+        viewModel.allDate.observe(viewLifecycleOwner, Observer {
+            adapter.submitList(it)
             adapter.setOnCellClickListener(
-                object : RecyclerAdapter.OnCellClickListener {
+                object : DateListAdapter.OnCellClickListener {
                     override fun onItemClick(item: String) {
-                        //itemデータを渡す処理
+                        // itemデータを渡す処理
                         setFragmentResult("stringData", bundleOf("itemString" to item))
 
-                        //画面遷移処理
+                        // 画面遷移処理
                         findNavController().navigate(R.id.navigation_map)
                     }
                 }
             )
+        })
 
-            recyclerView.adapter = adapter
-        }
 
-        recyclerView.layoutManager = LinearLayoutManager(context)
-        val dividerItemDecoration = DividerItemDecoration(context, LinearLayoutManager(context).orientation)
-        recyclerView.addItemDecoration(dividerItemDecoration)
+
         return root
     }
 
