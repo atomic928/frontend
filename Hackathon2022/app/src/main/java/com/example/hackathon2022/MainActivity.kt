@@ -163,7 +163,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
                     longitude = location.longitude
                 }
 
-            val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
+            val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
             val date = Date(0, dateNow, URL)
 
             sensorViewModel.insert(date)
