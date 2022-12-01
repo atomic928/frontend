@@ -49,8 +49,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private var mManager: SensorManager by Delegates.notNull()
     private var mSensor: Sensor by Delegates.notNull()
     private lateinit var locationManager: LocationManager
-    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private var speed = 0f
+    private var latitude : Double = 0.0
+    private var longitude : Double = 0.0
 
     private val sensorViewModel: SensorViewModel by viewModels {
         SensorViewModelFactory((application as DateApplication).repository)
@@ -58,15 +59,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
     private lateinit var binding: ActivityMainBinding
 
-    //mapのURL(変更可能にする必要あり)
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         //ダークモードかどうかを取得する
         val sharedPref = getSharedPreferences("Dark", Context.MODE_PRIVATE)
@@ -87,16 +83,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         //ロケーションマネージャーに端末のロケーションサービスを関連づける
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        //非同期処理
-//        coroutineScope.launch {
-//            val originalDeferred = coroutineScope.async(Dispatchers.IO) {
-//                getOriginalBitmap()
-//            }
-//
-//            val originalBitmap = originalDeferred.await()
-//            sensorViewModel.putMap(originalBitmap)
-//        }
 
         val navView: BottomNavigationView = binding.navView
 
@@ -124,44 +110,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     //センサーに何かしらのイベントが発生したときに呼ばれる
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onSensorChanged(event: SensorEvent?) {
-        //3つの値が配列で入ってくる
-        Log.v("sensorTest", "______")
-        //X軸方法
-        Log.v("sensorTest", event?.values!![0].toString())
-        //Y軸方法
-        Log.v("sensorTest", event.values!![1].toString())
-        //Z軸方法
-        Log.v("sensorTest", event.values!![2].toString())
+        // 加速度を送る
+        sensorViewModel.putAcceleration(event?.values!!)
 
-        sensorViewModel.putAcceleration(event.values!!)
-
+        // 加速度の大きさが一定値を超えた時に位置を記録する
         val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
         if (magnitudeOfAcceleration >= 7.9) {
             val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
-            var latitude : Double = 0.0
-            var longitude : Double = 0.0
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return
-            }
-            fusedLocationClient.lastLocation
-                .addOnSuccessListener { location : Location? ->
-                    latitude = location!!.latitude
-                    longitude = location.longitude
-                }
 
             val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
             val date = Date(0, dateNow, URL)
@@ -193,19 +148,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     }
 
     override fun onLocationChanged(location: Location) {
+        // 速度の取得
         speed = if (location.hasSpeed()) {
             location.speed*3.6f
         } else {
             0f
         }
         sensorViewModel.putSpeed(speed)
-        Log.d("speedTest", speed.toString())
+        // 現在地取得
+        latitude = location.latitude
+        longitude = location.longitude
     }
-
-//    private fun getOriginalBitmap(): Bitmap =
-//        URL(URL).openStream().use {
-//            BitmapFactory.decodeStream(it)
-//        }
 }
 
 
