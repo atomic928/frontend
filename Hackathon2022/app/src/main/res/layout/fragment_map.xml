@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".ui.map.MapFragment">
 
-    <ImageView
+    <com.ortiz.touchview.TouchImageView
         android:id="@+id/iv_map"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
