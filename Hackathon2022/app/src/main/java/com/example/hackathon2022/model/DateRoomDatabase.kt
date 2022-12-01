@@ -28,7 +28,7 @@ abstract class DateRoomDatabase: RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     DateRoomDatabase::class.java,
-                    "date_database"
+                    "date_database1"
                 )
                     .fallbackToDestructiveMigration()
 //                    .addCallback(DateDatabaseCallback(scope))
@@ -53,9 +53,9 @@ abstract class DateRoomDatabase: RoomDatabase() {
 //                }
 //            }
 //        }
-
+//
 //        suspend fun populateDatabase(dateDao: DateDao) {
-//            dateDao.getAll()
+//            dateDao.deleteALL()
 //        }
     }
 }

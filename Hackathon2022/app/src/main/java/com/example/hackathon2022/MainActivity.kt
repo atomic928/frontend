@@ -1,5 +1,6 @@
 package com.example.hackathon2022
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -8,6 +9,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -30,11 +32,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hackathon2022.databinding.ActivityMainBinding
 import com.example.hackathon2022.model.Date
 import com.example.hackathon2022.model.DateRoomDatabase
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import java.net.URL
 import java.time.LocalDate
 import java.time.LocalTime
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 import kotlin.properties.Delegates
@@ -45,16 +50,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private var mSensor: Sensor by Delegates.notNull()
     private lateinit var locationManager: LocationManager
     private var speed = 0f
+    private var latitude : Double = 0.0
+    private var longitude : Double = 0.0
 
     private val sensorViewModel: SensorViewModel by viewModels {
         SensorViewModelFactory((application as DateApplication).repository)
     }
 
     private lateinit var binding: ActivityMainBinding
-
-    //mapのURL(変更可能にする必要あり)
-    private val URL = "https://maps.googleapis.com/maps/api/staticmap?center=35.692134,139.759854&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ"
-    private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -80,16 +83,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
 
         //ロケーションマネージャーに端末のロケーションサービスを関連づける
         locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        //非同期処理
-        coroutineScope.launch {
-            val originalDeferred = coroutineScope.async(Dispatchers.IO) {
-                getOriginalBitmap()
-            }
-
-            val originalBitmap = originalDeferred.await()
-            sensorViewModel.putMap(originalBitmap)
-        }
 
         val navView: BottomNavigationView = binding.navView
 
@@ -117,24 +110,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     //センサーに何かしらのイベントが発生したときに呼ばれる
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onSensorChanged(event: SensorEvent?) {
-        //3つの値が配列で入ってくる
-        Log.v("sensorTest", "______")
-        //X軸方法
-        Log.v("sensorTest", event?.values!![0].toString())
-        //Y軸方法
-        Log.v("sensorTest", event.values!![1].toString())
-        //Z軸方法
-        Log.v("sensorTest", event.values!![2].toString())
+        // 加速度を送る
+        sensorViewModel.putAcceleration(event?.values!!)
 
-        sensorViewModel.putAcceleration(event.values!!)
-
+        // 加速度の大きさが一定値を超えた時に位置を記録する
         val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
         if (magnitudeOfAcceleration >= 7.9) {
             val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
-            val date = Date(0, dateNow)
+
+            val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
+            val date = Date(0, dateNow, URL)
+
             sensorViewModel.insert(date)
         }
-
     }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {
@@ -160,19 +148,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     }
 
     override fun onLocationChanged(location: Location) {
+        // 速度の取得
         speed = if (location.hasSpeed()) {
             location.speed*3.6f
         } else {
             0f
         }
         sensorViewModel.putSpeed(speed)
-        Log.d("speedTest", speed.toString())
+        // 現在地取得
+        latitude = location.latitude
+        longitude = location.longitude
     }
-
-    private fun getOriginalBitmap(): Bitmap =
-        URL(URL).openStream().use {
-            BitmapFactory.decodeStream(it)
-        }
 }
 
 

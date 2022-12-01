@@ -33,13 +33,6 @@ class SensorViewModel(application: Application, private val repository: DateRepo
         _backgroundColor.value = color
     }
 
-    private val _map = MutableLiveData<Bitmap>()
-    val map: LiveData<Bitmap> = _map
-
-    fun putMap(p0: Bitmap) {
-        _map.value = p0
-    }
-
     val allDate: LiveData<List<Date>> = repository.allDates.asLiveData()
 
     fun insert(date: Date) = viewModelScope.launch {
