@@ -113,15 +113,17 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         // 加速度を送る
         sensorViewModel.putAcceleration(event?.values!!)
 
-        // 加速度の大きさが一定値を超えた時に位置を記録する
-        val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
-        if (magnitudeOfAcceleration >= 7.9) {
-            val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
+        // 加速度の大きさが一定値を超えた時に位置を記録する（運転中の時のみ）
+        if (speed > 30) {
+            val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
+            if (magnitudeOfAcceleration >= 7.9) {
+                val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
 
-            val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
-            val date = Date(0, dateNow, URL)
+                val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
+                val date = Date(0, dateNow, URL)
 
-            sensorViewModel.insert(date)
+                sensorViewModel.insert(date)
+            }
         }
     }
 
