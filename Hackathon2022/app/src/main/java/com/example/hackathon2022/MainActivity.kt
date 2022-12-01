@@ -38,7 +38,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.coroutines.*
 import java.net.URL
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -52,6 +55,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
     private var speed = 0f
     private var latitude : Double = 0.0
     private var longitude : Double = 0.0
+    @RequiresApi(Build.VERSION_CODES.O)
+    private var driveTime: LocalDateTime = LocalDateTime.parse("2020-01-01T01:01:01")
 
     private val sensorViewModel: SensorViewModel by viewModels {
         SensorViewModelFactory((application as DateApplication).repository)
@@ -114,12 +119,14 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         sensorViewModel.putAcceleration(event?.values!!)
 
         // 加速度の大きさが一定値を超えた時に位置を記録する（運転中の時のみ）
-        if (speed > 30) {
-            val magnitudeOfAcceleration = sqrt(event.values[0].pow(2)+event.values[1].pow(2)+event.values[2].pow(2))
+        if (ChronoUnit.MINUTES.between(driveTime, LocalDateTime.now()) < 3) {
+            val magnitudeOfAcceleration =
+                sqrt(event.values[0].pow(2) + event.values[1].pow(2) + event.values[2].pow(2))
             if (magnitudeOfAcceleration >= 7.9) {
-                val dateNow = LocalDate.now().toString()+ "-" + LocalTime.now().toString()
+                val dateNow = LocalDate.now().toString() + "-" + LocalTime.now().toString()
 
-                val URL = "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
+                val URL =
+                    "https://maps.googleapis.com/maps/api/staticmap?center=$latitude,$longitude&size=640x320&scale=1&zoom=18&key=AIzaSyA-cfLegBoleKaT2TbU5R4K1uRkzBR6vUQ&markers=color:red|$latitude,$longitude"
                 val date = Date(0, dateNow, URL)
 
                 sensorViewModel.insert(date)
@@ -149,6 +156,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         mManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onLocationChanged(location: Location) {
         // 速度の取得
         speed = if (location.hasSpeed()) {
@@ -156,11 +164,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
         } else {
             0f
         }
+        if (speed > 30) {
+            driveTime = LocalDateTime.now()
+        }
         sensorViewModel.putSpeed(speed)
         // 現在地取得
         latitude = location.latitude
         longitude = location.longitude
     }
 }
+
 
 
