@@ -130,7 +130,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener, LocationListener 
                 val date = Date(0, dateNow, URL)
 
                 sensorViewModel.insert(date)
+                sensorViewModel.putIsDrive(1)
             }
+        } else {
+            sensorViewModel.putIsDrive(0)
         }
     }
 

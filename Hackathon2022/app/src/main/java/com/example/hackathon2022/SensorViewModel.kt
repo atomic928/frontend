@@ -26,6 +26,13 @@ class SensorViewModel(application: Application, private val repository: DateRepo
         _speed.value = p0
     }
 
+    private val _isDrive = MutableLiveData<Int>()
+    val isDrive: LiveData<Int> = _isDrive
+
+    fun putIsDrive(p0: Int) {
+        _isDrive.value = p0
+    }
+
     private val _backgroundColor = MutableLiveData<Int>()
     val backgroundColor: LiveData<Int> = _backgroundColor
 

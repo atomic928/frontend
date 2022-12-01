@@ -169,12 +169,14 @@ class HomeFragment : Fragment(){
         }
 
         val textSpeed: TextView = binding.textSpeed
-        val textIsDrive: TextView  = binding.tvIsDrive
-
         viewModel.speed.observe(viewLifecycleOwner) {
-            /*このスコープ内のitがスピードを表している*/
             textSpeed.text = it.toString()
-            if (it >= 30) {
+        }
+
+        val textIsDrive: TextView  = binding.tvIsDrive
+        viewModel.isDrive.observe(viewLifecycleOwner) {
+            /*このスコープ内のitがスピードを表している*/
+            if (it == 1) {
                 textIsDrive.text = "運転中"
             } else {
                 textIsDrive.text = "運転はしていません"
