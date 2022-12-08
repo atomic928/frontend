@@ -20,6 +20,7 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
+import org.w3c.dom.Text
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.math.pow
@@ -78,6 +79,7 @@ class HomeFragment : Fragment(){
         val dataSets = ArrayList<ILineDataSet>()
         viewModel.acceleration.observe(viewLifecycleOwner) {
             addCount++
+            // 加速度の大きさによって背景を変更する
             textX.text = it[0].toString()
             textY.text = it[1].toString()
             textZ.text = it[2].toString()
@@ -87,8 +89,12 @@ class HomeFragment : Fragment(){
             } else if (magnitudeOfAcceleration < 7.9) {
                 viewModel.putBackgroundColor(Color.YELLOW)
             } else {
-                val dialog = AlertDialogFragment()
-                dialog.show(childFragmentManager, "sample")
+                viewModel.speed.observe(viewLifecycleOwner) { speed->
+                    if (speed > 30) {
+                        val dialog = AlertDialogFragment()
+                        dialog.show(childFragmentManager, "sample")
+                    }
+                }
                 viewModel.putBackgroundColor(Color.RED)
             }
 
@@ -136,8 +142,6 @@ class HomeFragment : Fragment(){
             valueDataSetZ.lineWidth = 1.0f
             valueDataSetZ.color = colors[2]
 
-//            Log.v("valueSize", valueX.size.toString())
-
             dataSets.add(valueDataSetX)
             dataSets.add(valueDataSetY)
             dataSets.add(valueDataSetZ)
@@ -155,9 +159,6 @@ class HomeFragment : Fragment(){
                 dataSets.removeAt(0)
             }
 
-//          Log.v("valueSize", dataSets.size.toString())
-//            Log.v("valueSize", dataSets[0].toString())
-
             mChart.data = LineData(dataSets)
             mChart.setVisibleXRangeMaximum(50f) // 表示の幅を決定する
             mChart.moveViewToX(addCount.toFloat()) // 最新のデータまで表示を移動させる
@@ -168,10 +169,18 @@ class HomeFragment : Fragment(){
         }
 
         val textSpeed: TextView = binding.textSpeed
-
         viewModel.speed.observe(viewLifecycleOwner) {
-            /*このスコープ内のitがスピードを表している*/
             textSpeed.text = it.toString()
+        }
+
+        val textIsDrive: TextView  = binding.tvIsDrive
+        viewModel.isDrive.observe(viewLifecycleOwner) {
+            /*このスコープ内のitがスピードを表している*/
+            if (it == 1) {
+                textIsDrive.text = "運転中"
+            } else {
+                textIsDrive.text = "運転はしていません"
+            }
         }
 
         return root
